@@ -1,43 +1,74 @@
-version: "3.8"
+# version: "3.8"
 
+# services:
+#   mongodb:
+#     image: mongo:latest
+#     container_name: mongodb
+#     ports:
+#       - "27017:27017"
+#     networks:
+#       - app-network
+#     volumes:
+#       - mongodb-data:/data/db
+
+#   modulo-prestamos:
+#     build:
+#       context: ./modulo-prestamos
+#       dockerfile: Dockerfile
+#     container_name: modulo-prestamos
+#     ports:
+#       - "8080:8080"
+#     networks:
+#       - app-network
+#     environment:
+#       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/modulo-prestamos-db
+
+#   modulo-inicio-sesion:
+#     build:
+#       context: ./modulo-cobros
+#       dockerfile: Dockerfile
+#     container_name: modulo-cobros
+#     ports:
+#       - "8081:8081"
+#     networks:
+#       - app-network
+#     environment:
+#       SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/modulo-cobros-db
+
+# networks:
+#   app-network:
+#     driver: bridge
+
+# volumes:
+#   mongodb-data:
+
+
+version: "3.9"
 services:
-  mongodb:
-    image: mongo:latest
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/modulo-prestamos
+      - AUTH_EXTERNAL_URL=http://localhost:8084/elementos
+    depends_on:
+      - mongo
+    networks:
+      - app_network
+
+  mongo:
+    image: mongo:6.0
     container_name: mongodb
     ports:
       - "27017:27017"
-    networks:
-      - app-network
-    volumes:
-      - mongodb-data:/data/db
-
-  modulo-prestamos:
-    build:
-      context: ./modulo-prestamos
-      dockerfile: Dockerfile
-    container_name: modulo-prestamos
-    ports:
-      - "8080:8080"
-    networks:
-      - app-network
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/modulo-prestamos-db
-
-  modulo-inicio-sesion:
-    build:
-      context: ./modulo-cobros
-      dockerfile: Dockerfile
-    container_name: modulo-cobros
-    ports:
-      - "8081:8081"
+      MONGO_INITDB_DATABASE: modulo-prestamos
     networks:
-      - app-network
-    environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/modulo-cobros-db
+      - app_network
 
 networks:
-  app-network:
+  app_network:
     driver: bridge
-
-volumes:
-  mongodb-data:
