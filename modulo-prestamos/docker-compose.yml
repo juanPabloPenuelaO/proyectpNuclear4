@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+    volumes:
+      - mongodb-data:/data/db
+
+  modulo-prestamos:
+    build:
+      context: ./modulo-prestamos
+      dockerfile: Dockerfile
+    container_name: modulo-prestamos
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/modulo-prestamos-db
+
+  modulo-inicio-sesion:
+    build:
+      context: ./modulo-cobros
+      dockerfile: Dockerfile
+    container_name: modulo-cobros
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/modulo-cobros-db
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
